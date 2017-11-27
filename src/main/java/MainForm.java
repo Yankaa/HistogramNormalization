@@ -1,5 +1,5 @@
+import Algorithm.Algorithm;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -15,7 +15,7 @@ public class MainForm {
   private JPanel afterPanel;
   private JPanel beforePanel;
 
-  private BufferedImage bufferedImage;
+  private Algorithm algorithm = new Algorithm();
 
   private MainForm() {
     button_openImage.addActionListener(e -> downloadImage());
@@ -27,52 +27,19 @@ public class MainForm {
 
     if (showDialog == JFileChooser.APPROVE_OPTION) {
       try {
-        bufferedImage = ImageIO.read(fileChooser.getSelectedFile());
+        BufferedImage bufferedImage = ImageIO.read(fileChooser.getSelectedFile());
+        algorithm.setBufferedImage(bufferedImage);
       } catch (IOException e) {
         e.printStackTrace();
       }
     }
 
-    drawImage(beforePanel, bufferedImage);
+    drawImage(beforePanel, algorithm.getBufferedImage());
 
-    start();
-  }
+    algorithm.start();
 
-  private void start() {
-    WritableRaster writableRaster = bufferedImage.getRaster();
+    drawImage(afterPanel, algorithm.getBufferedImage());
 
-    int max = 0;
-    int min = 255;
-    int[] pixel = new int[3];
-
-    for (int i = 0; i < writableRaster.getWidth(); i++) {
-      for (int j = 0; j < writableRaster.getHeight(); j++) {
-        writableRaster.getPixel(i, j, pixel);
-
-        if (pixel[0] > max) {
-          max = pixel[0];
-        }
-        if (pixel[0] < min) {
-          min = pixel[0];
-        }
-      }
-    }
-
-    for (int i = 0; i < writableRaster.getWidth(); i++) {
-      for (int j = 0; j < writableRaster.getHeight(); j++) {
-        writableRaster.getPixel(i, j, pixel);
-
-        int value = (pixel[0] - min) * 255 / (max - min);
-
-        pixel[0] = value;
-        pixel[1] = value;
-        pixel[2] = value;
-
-        writableRaster.setPixel(i, j, pixel);
-      }
-    }
-
-    drawImage(afterPanel, bufferedImage);
   }
 
   private void drawImage(JPanel panel, BufferedImage image) {
