@@ -1,4 +1,5 @@
-import Algorithm.Algorithm;
+import Algorithm.MinMax;
+import Algorithm.Realization;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -15,35 +16,10 @@ public class MainForm {
   private JPanel afterPanel;
   private JPanel beforePanel;
 
-  private Algorithm algorithm = new Algorithm();
+  private Realization realization = new Realization();
 
   private MainForm() {
     button_openImage.addActionListener(e -> downloadImage());
-  }
-
-  private void downloadImage() {
-    JFileChooser fileChooser = new JFileChooser();
-    int showDialog = fileChooser.showDialog(null, "Выберите картинку");
-
-    if (showDialog == JFileChooser.APPROVE_OPTION) {
-      try {
-        BufferedImage bufferedImage = ImageIO.read(fileChooser.getSelectedFile());
-        algorithm.setBufferedImage(bufferedImage);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-
-    drawImage(beforePanel, algorithm.getBufferedImage());
-
-    algorithm.start();
-
-    drawImage(afterPanel, algorithm.getBufferedImage());
-
-  }
-
-  private void drawImage(JPanel panel, BufferedImage image) {
-    panel.getGraphics().drawImage(image, 1, 1, panel.getWidth() - 2, panel.getHeight() - 2, null);
   }
 
   /**
@@ -57,5 +33,31 @@ public class MainForm {
     jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     jFrame.pack();
     jFrame.setVisible(true);
+  }
+
+  private void downloadImage() {
+    JFileChooser fileChooser = new JFileChooser();
+    int showDialog = fileChooser.showDialog(null, "Выберите картинку");
+
+    if (showDialog == JFileChooser.APPROVE_OPTION) {
+      try {
+        BufferedImage bufferedImage = ImageIO.read(fileChooser.getSelectedFile());
+        realization.setBufferedImage(bufferedImage);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    drawImage(beforePanel, realization.getBufferedImage());
+
+    MinMax minAndMax = realization.getMinAndMax();
+    realization.normalization(minAndMax.getMin(), minAndMax.getMax());
+
+    drawImage(afterPanel, realization.getBufferedImage());
+
+  }
+
+  private void drawImage(JPanel panel, BufferedImage image) {
+    panel.getGraphics().drawImage(image, 1, 1, panel.getWidth() - 2, panel.getHeight() - 2, null);
   }
 }
